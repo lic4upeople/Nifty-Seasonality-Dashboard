@@ -324,5 +324,118 @@ try:
 except Exception as e:
     print("Best Month Ranking Error")
     print(str(e))
+# ==========================================
+# SECTOR RANKING ENGINE
+# ==========================================
 
+try:
+
+    sector_results = []
+
+    sector_sheets = [
+        "Raw_Nifty50",
+        "Raw_BankNifty",
+        "Raw_IT",
+        "Raw_Auto",
+        "Raw_FMCG",
+        "Raw_Pharma",
+        "Raw_Metal",
+        "Raw_Realty",
+        "Raw_FinancialServices",
+        "Raw_PSUBank"
+    ]
+
+    for sector in sector_sheets:
+
+        try:
+
+            ws_sector = spreadsheet.worksheet(sector)
+
+            data = ws_sector.get_all_values()
+
+            if len(data) <= 1:
+                continue
+
+            df_sector = pd.DataFrame(
+                data[1:],
+                columns=data[0]
+            )
+
+            df_sector["Return %"] = pd.to_numeric(
+                df_sector["Return %"],
+                errors="coerce"
+            )
+
+            avg_return = round(
+                df_sector["Return %"].mean(),
+                2
+            )
+
+            win_rate = round(
+                (
+                    (df_sector["Return %"] > 0).sum()
+                    /
+                    df_sector["Return %"].count()
+                ) * 100,
+                2
+            )
+
+            sector_results.append([
+                sector.replace("Raw_", ""),
+                avg_return,
+                win_rate
+            ])
+
+        except Exception as e:
+            print(f"Sector Error: {sector}")
+            print(str(e))
+
+    ranking_df = pd.DataFrame(
+        sector_results,
+        columns=[
+            "Sector",
+            "Avg Return",
+            "Win Rate %"
+        ]
+    )
+
+    ranking_df = ranking_df.sort_values(
+        by="Avg Return",
+        ascending=False
+    )
+
+    ranking_df.insert(
+        0,
+        "Rank",
+        range(1, len(ranking_df) + 1)
+    )
+
+    try:
+        ws_sector_rank = spreadsheet.worksheet(
+            "Sector_Ranking_V2"
+        )
+    except:
+        ws_sector_rank = spreadsheet.add_worksheet(
+            title="Sector_Ranking_V2",
+            rows=50,
+            cols=10
+        )
+
+    ws_sector_rank.clear()
+
+    sector_data = [
+        ranking_df.columns.tolist()
+    ] + ranking_df.values.tolist()
+
+    ws_sector_rank.update(
+        values=sector_data,
+        range_name="A1"
+    )
+
+    print("Sector Ranking Updated")
+
+except Exception as e:
+    print("Sector Ranking Error")
+    print(str(e))
+    
 print("Google Sheet Updated Successfully")
