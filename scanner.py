@@ -68,7 +68,7 @@ for sheet_name, ticker in indices.items():
             auto_adjust=True,
             progress=False,
             threads=False
-    )
+        )
 
         if df.empty:
             print(f"No data found for {ticker}")
@@ -116,7 +116,8 @@ for sheet_name, ticker in indices.items():
         )
 
         print(f"{sheet_name} updated successfully")
-
+        time.sleep(2)
+        
     except Exception as e:
         print(f"Error processing {sheet_name}")
         print(str(e))
