@@ -60,13 +60,13 @@ for sheet_name, ticker in indices.items():
 
     try:
 
-    df = yf.download(
-        ticker,
-        period="10y",
-        interval="1mo",
-        auto_adjust=True,
-        progress=False
-    )
+        df = yf.download(
+            ticker,
+            period="10y",
+            interval="1mo",
+            auto_adjust=True,
+            progress=False
+        )
 
     if df.empty:
         print(f"No data found for {ticker}")
