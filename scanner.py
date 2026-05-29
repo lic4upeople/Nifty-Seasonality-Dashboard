@@ -67,8 +67,10 @@ for sheet_name, ticker in indices.items():
             df.columns = [col[0] for col in df.columns]
 
         df["Return %"] = (
-            df["Close"].pct_change() * 100
+        df["Close"].pct_change() * 100
         ).round(2)
+
+        df["Close"] = df["Close"].round(2)
 
         result = df[["Date", "Close", "Return %"]].copy()
 
