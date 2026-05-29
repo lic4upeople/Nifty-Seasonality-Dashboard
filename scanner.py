@@ -3,6 +3,7 @@ import json
 import pandas as pd
 import yfinance as yf
 import gspread
+import time
 from oauth2client.service_account import ServiceAccountCredentials
 
 # ==========================================
@@ -65,8 +66,9 @@ for sheet_name, ticker in indices.items():
             period="10y",
             interval="1mo",
             auto_adjust=True,
-            progress=False
-        )
+            progress=False,
+            threads=False
+    )
 
         if df.empty:
             print(f"No data found for {ticker}")
