@@ -41,7 +41,15 @@ spreadsheet = client.open_by_key(sheet_id)
 
 indices = {
     "Raw_Nifty50": "^NSEI",
-    "Raw_BankNifty": "^NSEBANK"
+    "Raw_BankNifty": "^NSEBANK",
+    "Raw_IT": "^CNXIT",
+    "Raw_Auto": "^CNXAUTO",
+    "Raw_FMCG": "^CNXFMCG",
+    "Raw_Pharma": "^CNXPHARMA",
+    "Raw_Metal": "^CNXMETAL",
+    "Raw_Realty": "^CNXREALTY",
+    "Raw_FinancialServices": "^CNXFINSERVICE",
+    "Raw_PSUBank": "^CNXPSUBANK"
 }
 
 # ==========================================
