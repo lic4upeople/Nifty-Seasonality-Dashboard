@@ -14,7 +14,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 creds_json = os.environ.get("GCP_CREDENTIALS")
 
 if not creds_json:
-raise Exception("GCP_CREDENTIALS secret not found")
+    raise Exception("GCP_CREDENTIALS secret not found")
 
 creds_dict = json.loads(creds_json)
 
@@ -33,7 +33,7 @@ client = gspread.authorize(creds)
 sheet_id = os.environ.get("SHEET_ID")
 
 if not sheet_id:
-raise Exception("SHEET_ID secret not found")
+    raise Exception("SHEET_ID secret not found")
 
 spreadsheet = client.open_by_key(sheet_id)
 
