@@ -56,7 +56,7 @@ indices = {
 
 for sheet_name, ticker in indices.items():
 
-print(f"Processing {sheet_name}")
+    print(f"Processing {sheet_name}")
 
 try:
 
