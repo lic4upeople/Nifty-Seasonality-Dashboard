@@ -127,9 +127,9 @@ except Exception as e:
 
 try:
 
-ws_raw = spreadsheet.worksheet("Raw_Nifty50")
+    ws_raw = spreadsheet.worksheet("Raw_Nifty50")
 
-raw_data = ws_raw.get_all_values()
+    raw_data = ws_raw.get_all_values()
 
 season_df = pd.DataFrame(
     raw_data[1:],
