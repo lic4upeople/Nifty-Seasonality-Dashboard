@@ -91,14 +91,17 @@ for sheet_name, ticker in indices.items():
 
         ws.clear()
 
-        data = [result.columns.tolist()]
+        headers = list(result.columns)
 
-        for row in result.values.tolist():
-            data.append(row)
+        rows = result.values.tolist()
 
+        data = [headers] + rows
+
+        print("Headers:", headers)
+        print("First Row:", rows[0] if rows else "No Data")
         ws.update(
-            values=data,
-            range_name="A1"
+            range_name="A1:C500",
+            values=data
         )
 
         print(f"{sheet_name} updated successfully")
