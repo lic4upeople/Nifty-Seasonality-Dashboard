@@ -48,7 +48,7 @@ indices = {
     "Raw_Pharma": "^CNXPHARMA",
     "Raw_Metal": "^CNXMETAL",
     "Raw_Realty": "^CNXREALTY",
-    "Raw_FinancialServices": "^CNXFINSERVICE",
+    "Raw_FinancialServices": "NIFTY_FIN_SERVICE.NS",
     "Raw_PSUBank": "^CNXPSUBANK"
 }
 
