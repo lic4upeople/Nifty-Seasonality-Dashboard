@@ -134,7 +134,19 @@ try:
     season_df["Year"] = season_df["Date"].dt.year
 
     season_df["Month"] = season_df["Date"].dt.strftime("%b")
+current_year = pd.Timestamp.today().year
 
+all_years = sorted(
+    season_df["Year"].unique()
+)
+
+first_year = all_years[0]
+
+season_df = season_df[
+    (season_df["Year"] != first_year)
+    &
+    (season_df["Year"] != current_year)
+]
     matrix = season_df.pivot_table(
         index="Year",
         columns="Month",
