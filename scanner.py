@@ -118,7 +118,6 @@ try:
 except Exception as e:
     print(f"Error processing {sheet_name}")
     print(str(e))
-```
 
 # ==========================================
 
@@ -128,7 +127,6 @@ except Exception as e:
 
 try:
 
-```
 ws_raw = spreadsheet.worksheet("Raw_Nifty50")
 
 raw_data = ws_raw.get_all_values()
@@ -210,7 +208,6 @@ ws_season.update(
 )
 
 print("Seasonality Matrix Updated")
-```
 
 except Exception as e:
 print("Seasonality Error")
@@ -224,7 +221,6 @@ print(str(e))
 
 try:
 
-```
 stats = []
 
 for month in month_order:
@@ -288,7 +284,6 @@ ws_stats.update(
 )
 
 print("Seasonality Stats Updated")
-```
 
 except Exception as e:
 print("Seasonality Stats Error")
@@ -302,7 +297,6 @@ print(str(e))
 
 try:
 
-```
 ranking_df = stats_df.copy()
 
 ranking_df = ranking_df.sort_values(
@@ -339,7 +333,6 @@ ws_rank.update(
 )
 
 print("Best Month Ranking Updated")
-```
 
 except Exception as e:
 print("Best Month Ranking Error")
