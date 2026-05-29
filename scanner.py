@@ -109,5 +109,78 @@ for sheet_name, ticker in indices.items():
     except Exception as e:
         print(f"Error processing {sheet_name}")
         print(str(e))
+# ==========================================
+# SEASONALITY MATRIX - NIFTY50
+# ==========================================
 
+try:
+
+    ws_raw = spreadsheet.worksheet("Raw_Nifty50")
+
+    raw_data = ws_raw.get_all_values()
+
+    season_df = pd.DataFrame(
+        raw_data[1:],
+        columns=raw_data[0]
+    )
+
+    season_df["Date"] = pd.to_datetime(season_df["Date"])
+
+    season_df["Return %"] = pd.to_numeric(
+        season_df["Return %"],
+        errors="coerce"
+    )
+
+    season_df["Year"] = season_df["Date"].dt.year
+
+    season_df["Month"] = season_df["Date"].dt.strftime("%b")
+
+    matrix = season_df.pivot_table(
+        index="Year",
+        columns="Month",
+        values="Return %",
+        aggfunc="first"
+    )
+
+    month_order = [
+        "Jan","Feb","Mar","Apr","May","Jun",
+        "Jul","Aug","Sep","Oct","Nov","Dec"
+    ]
+
+    matrix = matrix.reindex(
+        columns=month_order
+    )
+
+    matrix = matrix.round(2)
+
+    matrix.reset_index(inplace=True)
+
+    try:
+        ws_season = spreadsheet.worksheet(
+            "Sector_Seasonality"
+        )
+    except:
+        ws_season = spreadsheet.add_worksheet(
+            title="Sector_Seasonality",
+            rows=100,
+            cols=20
+        )
+
+    ws_season.clear()
+
+    season_data = [
+        matrix.columns.tolist()
+    ] + matrix.fillna("").values.tolist()
+
+    ws_season.update(
+        values=season_data,
+        range_name="A1"
+    )
+
+    print("Seasonality Matrix Updated")
+
+except Exception as e:
+    print("Seasonality Error")
+    print(str(e))
+    
 print("Google Sheet Updated Successfully")
