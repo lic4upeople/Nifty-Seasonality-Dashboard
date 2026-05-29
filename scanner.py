@@ -36,7 +36,8 @@ spreadsheet = client.open_by_key(sheet_id)
 # INDEX LIST
 
 indices = {
-    "Nifty50": "^NSEI"
+   "Raw_Nifty50": "^NSEI",
+   "Raw_BankNifty": "^NSEBANK"
 }
 
 # DOWNLOAD & UPDATE SHEET
