@@ -14,7 +14,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 creds_json = os.environ.get("GCP_CREDENTIALS")
 
 if not creds_json:
-raise Exception("GCP_CREDENTIALS secret not found")
+    raise Exception("GCP_CREDENTIALS secret not found")
 
 creds_dict = json.loads(creds_json)
 
