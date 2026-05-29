@@ -88,6 +88,5 @@ for sheet_name, ticker in indices.items():
     data = [result.columns.tolist()] + result.values.tolist()
 
     ws.update(data)
-    )
 
 print("Google Sheet Updated Successfully")
