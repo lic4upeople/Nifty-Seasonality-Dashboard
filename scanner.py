@@ -5,9 +5,9 @@ import yfinance as yf
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-# -----------------------------
+# ==========================================
 # GOOGLE SHEET CONNECTION
-# -----------------------------
+# ==========================================
 
 creds_json = os.environ.get("GCP_CREDENTIALS")
 
@@ -30,66 +30,81 @@ client = gspread.authorize(creds)
 
 sheet_id = os.environ.get("SHEET_ID")
 
+if not sheet_id:
+    raise Exception("SHEET_ID secret not found")
+
 spreadsheet = client.open_by_key(sheet_id)
 
-# -----------------------------
+# ==========================================
 # INDEX LIST
-# -----------------------------
+# ==========================================
 
 indices = {
     "Nifty50": "^NSEI"
 }
 
-# -----------------------------
-# DOWNLOAD DATA
-# -----------------------------
+# ==========================================
+# DOWNLOAD & UPDATE SHEET
+# ==========================================
 
 for sheet_name, ticker in indices.items():
 
     print(f"Processing {sheet_name}")
 
-    df = yf.download(
-        ticker,
-        period="10y",
-        interval="1mo",
-        auto_adjust=True
-    )
+    try:
 
-    if df.empty:
-        print(f"No data found for {ticker}")
-        continue
+        df = yf.download(
+            ticker,
+            period="10y",
+            interval="1mo",
+            auto_adjust=True,
+            progress=False
+        )
 
-    df.reset_index(inplace=True)
+        if df.empty:
+            print(f"No data found for {ticker}")
+            continue
 
-    df["Year"] = df["Date"].dt.year
-    df["Month"] = df["Date"].dt.strftime("%b")
+        df.reset_index(inplace=True)
 
-    df["Return %"] = (
-        df["Close"].pct_change() * 100
-    ).round(2)
+        df["Return %"] = (
+            df["Close"].pct_change() * 100
+        ).round(2)
 
-    result = df[["Date", "Close", "Return %"]].copy()
+        result = df[["Date", "Close", "Return %"]].copy()
 
-    result["Date"] = result["Date"].dt.strftime("%Y-%m-%d")
+        result["Date"] = pd.to_datetime(
+            result["Date"]
+        ).dt.strftime("%Y-%m-%d")
 
-    result = result.fillna("")
+        result = result.fillna("")
+        result = result.astype(str)
 
-   try:
-    ws = spreadsheet.worksheet(sheet_name)
-except:
-    ws = spreadsheet.add_worksheet(
-        title=sheet_name,
-        rows=1000,
-        cols=20
-    )
+        try:
+            ws = spreadsheet.worksheet(sheet_name)
+        except:
+            ws = spreadsheet.add_worksheet(
+                title=sheet_name,
+                rows=1000,
+                cols=20
+            )
 
-ws.clear()
+        ws.clear()
 
-data = [result.columns.tolist()]
+        data = [result.columns.tolist()]
 
-for row in result.values.tolist():
-    data.append([str(x) for x in row])
+        for row in result.values.tolist():
+            data.append(row)
 
-ws.update("A1", data)
+        ws.update(
+            values=data,
+            range_name="A1"
+        )
+
+        print(f"{sheet_name} updated successfully")
+
+    except Exception as e:
+        print(f"Error processing {sheet_name}")
+        print(str(e))
 
 print("Google Sheet Updated Successfully")
