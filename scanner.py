@@ -182,5 +182,78 @@ try:
 except Exception as e:
     print("Seasonality Error")
     print(str(e))
+    # ==========================================
+# SEASONALITY STATS
+# ==========================================
+
+try:
+
+    stats = []
+
+    for month in month_order:
+
+        values = pd.to_numeric(
+            matrix[month],
+            errors="coerce"
+        )
+
+        avg_return = round(
+            values.mean(),
+            2
+        )
+
+        positive_count = (
+            values > 0
+        ).sum()
+
+        total_count = values.count()
+
+        win_rate = round(
+            (positive_count / total_count) * 100,
+            2
+        ) if total_count > 0 else 0
+
+        stats.append([
+            month,
+            avg_return,
+            win_rate
+        ])
+
+    stats_df = pd.DataFrame(
+        stats,
+        columns=[
+            "Month",
+            "Avg Return",
+            "Win Rate %"
+        ]
+    )
+
+    try:
+        ws_stats = spreadsheet.worksheet(
+            "Seasonality_Stats"
+        )
+    except:
+        ws_stats = spreadsheet.add_worksheet(
+            title="Seasonality_Stats",
+            rows=50,
+            cols=10
+        )
+
+    ws_stats.clear()
+
+    stats_data = [
+        stats_df.columns.tolist()
+    ] + stats_df.values.tolist()
+
+    ws_stats.update(
+        values=stats_data,
+        range_name="A1"
+    )
+
+    print("Seasonality Stats Updated")
+
+except Exception as e:
+    print("Seasonality Stats Error")
+    print(str(e))
     
 print("Google Sheet Updated Successfully")
