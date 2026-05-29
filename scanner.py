@@ -74,19 +74,22 @@ for sheet_name, ticker in indices.items():
 
     result = result.fillna("")
 
-    try:
-        ws = spreadsheet.worksheet(sheet_name)
-    except:
-        ws = spreadsheet.add_worksheet(
-            title=sheet_name,
-            rows=1000,
-            cols=20
-        )
+   try:
+    ws = spreadsheet.worksheet(sheet_name)
+except:
+    ws = spreadsheet.add_worksheet(
+        title=sheet_name,
+        rows=1000,
+        cols=20
+    )
 
-    ws.clear()
+ws.clear()
 
-    data = [result.columns.tolist()] + result.values.tolist()
+data = [result.columns.tolist()]
 
-    ws.update(data)
+for row in result.values.tolist():
+    data.append([str(x) for x in row])
+
+ws.update("A1", data)
 
 print("Google Sheet Updated Successfully")
