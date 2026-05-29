@@ -255,5 +255,51 @@ try:
 except Exception as e:
     print("Seasonality Stats Error")
     print(str(e))
+    # ==========================================
+# BEST MONTH RANKING
+# ==========================================
+
+try:
+
+    ranking_df = stats_df.copy()
+
+    ranking_df = ranking_df.sort_values(
+        by="Avg Return",
+        ascending=False
+    )
+
+    ranking_df.insert(
+        0,
+        "Rank",
+        range(1, len(ranking_df) + 1)
+    )
+
+    try:
+        ws_rank = spreadsheet.worksheet(
+            "Best_Month_Ranking"
+        )
+    except:
+        ws_rank = spreadsheet.add_worksheet(
+            title="Best_Month_Ranking",
+            rows=50,
+            cols=10
+        )
+
+    ws_rank.clear()
+
+    ranking_data = [
+        ranking_df.columns.tolist()
+    ] + ranking_df.values.tolist()
+
+    ws_rank.update(
+        values=ranking_data,
+        range_name="A1"
+    )
+
+    print("Best Month Ranking Updated")
+
+except Exception as e:
+    print("Best Month Ranking Error")
+    print(str(e))
     
 print("Google Sheet Updated Successfully")
