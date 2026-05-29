@@ -437,5 +437,122 @@ try:
 except Exception as e:
     print("Sector Ranking Error")
     print(str(e))
+ # ==========================================
+# SECTOR MOMENTUM ENGINE
+# ==========================================
+
+try:
+
+    momentum_results = []
+
+    sector_sheets = [
+        "Raw_Nifty50",
+        "Raw_BankNifty",
+        "Raw_IT",
+        "Raw_Auto",
+        "Raw_FMCG",
+        "Raw_Pharma",
+        "Raw_Metal",
+        "Raw_Realty",
+        "Raw_FinancialServices",
+        "Raw_PSUBank"
+    ]
+
+    for sector in sector_sheets:
+
+        try:
+
+            ws_sector = spreadsheet.worksheet(sector)
+
+            data = ws_sector.get_all_values()
+
+            if len(data) <= 7:
+                continue
+
+            df_sector = pd.DataFrame(
+                data[1:],
+                columns=data[0]
+            )
+
+            df_sector["Close"] = pd.to_numeric(
+                df_sector["Close"],
+                errors="coerce"
+            )
+
+            df_sector = df_sector.dropna()
+
+            latest_close = df_sector["Close"].iloc[-1]
+
+            close_3m = df_sector["Close"].iloc[-4]
+
+            close_6m = df_sector["Close"].iloc[-7]
+
+            return_3m = round(
+                ((latest_close / close_3m) - 1) * 100,
+                2
+            )
+
+            return_6m = round(
+                ((latest_close / close_6m) - 1) * 100,
+                2
+            )
+
+            momentum_results.append([
+                sector.replace("Raw_", ""),
+                return_3m,
+                return_6m
+            ])
+
+        except Exception as e:
+            print(f"Momentum Error: {sector}")
+            print(str(e))
+
+    momentum_df = pd.DataFrame(
+        momentum_results,
+        columns=[
+            "Sector",
+            "3M Return %",
+            "6M Return %"
+        ]
+    )
+
+    momentum_df = momentum_df.sort_values(
+        by="3M Return %",
+        ascending=False
+    )
+
+    momentum_df.insert(
+        0,
+        "Rank",
+        range(1, len(momentum_df) + 1)
+    )
+
+    try:
+        ws_momentum = spreadsheet.worksheet(
+            "Sector_Momentum_V2"
+        )
+    except:
+        ws_momentum = spreadsheet.add_worksheet(
+            title="Sector_Momentum_V2",
+            rows=50,
+            cols=10
+        )
+
+    ws_momentum.clear()
+
+    momentum_data = [
+        momentum_df.columns.tolist()
+    ] + momentum_df.values.tolist()
+
+    ws_momentum.update(
+        values=momentum_data,
+        range_name="A1"
+    )
+
+    print("Sector Momentum Updated")
+
+except Exception as e:
+    print("Sector Momentum Error")
+    print(str(e))   
     
 print("Google Sheet Updated Successfully")
