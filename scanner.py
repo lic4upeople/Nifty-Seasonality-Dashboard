@@ -68,7 +68,11 @@ for sheet_name, ticker in indices.items():
         df["Close"].pct_change() * 100
     ).round(2)
 
-    result = df[["Date", "Close", "Return %"]]
+    result = df[["Date", "Close", "Return %"]].copy()
+
+    result["Date"] = result["Date"].dt.strftime("%Y-%m-%d")
+
+    result = result.fillna("")
 
     try:
         ws = spreadsheet.worksheet(sheet_name)
@@ -81,9 +85,9 @@ for sheet_name, ticker in indices.items():
 
     ws.clear()
 
-    ws.update(
-        [result.columns.values.tolist()]
-        + result.values.tolist()
+    data = [result.columns.tolist()] + result.values.tolist()
+
+    ws.update(data)
     )
 
 print("Google Sheet Updated Successfully")
