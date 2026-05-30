@@ -690,7 +690,7 @@ try:
     )
 
     if "Rank" in ai_df.columns:
-    del ai_df["Rank"]
+        del ai_df["Rank"]
 
     ai_df.insert(
         0,
