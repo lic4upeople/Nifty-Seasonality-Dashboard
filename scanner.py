@@ -80,15 +80,30 @@ for sheet_name, ticker in indices.items():
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = [col[0] for col in df.columns]
             
+           
         # Remove future dates
+
+        df["Date"] = pd.to_datetime(
+            df["Date"],
+            errors="coerce"
+        )
         
-        df["Date"] = pd.to_datetime(df["Date"])
-        
-        today = pd.Timestamp.today()
+        current_year = pd.Timestamp.today().year
         
         df = df[
-            df["Date"] <= today
+            df["Date"].dt.year <= current_year
         ]
+        
+        if "Volume" in df.columns:
+            df = df[df["Volume"] > 0]
+        
+        df = df.sort_values("Date")
+       
+        today = pd.Timestamp.today()
+
+        df = df[
+            df["Date"] <= today
+        ]   
         
         df["Return %"] = (
             df["Close"].pct_change() * 100
