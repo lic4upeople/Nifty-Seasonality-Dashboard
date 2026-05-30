@@ -478,7 +478,21 @@ try:
                 df_sector["Close"],
                 errors="coerce"
             )
-
+            df_sector["Date"] = pd.to_datetime(
+                df_sector["Date"],
+                errors="coerce"
+            )
+            
+            df_sector = df_sector.sort_values(
+                by="Date"
+            )
+            
+            today = pd.Timestamp.today()
+            
+            df_sector = df_sector[
+                df_sector["Date"] <= today
+            ]
+            
             df_sector = df_sector.dropna()
 
             latest_close = df_sector["Close"].iloc[-1]
