@@ -75,10 +75,21 @@ for sheet_name, ticker in indices.items():
             continue
 
         df.reset_index(inplace=True)
-
+            print(df.tail())
+        
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = [col[0] for col in df.columns]
-
+            
+        # Remove future dates
+        
+        df["Date"] = pd.to_datetime(df["Date"])
+        
+        today = pd.Timestamp.today()
+        
+        df = df[
+            df["Date"] <= today
+        ]
+        
         df["Return %"] = (
             df["Close"].pct_change() * 100
         ).round(2)
