@@ -734,5 +734,146 @@ try:
 except Exception as e:
     print("AI Sector Score Error")
     print(str(e))
+ # ==========================================
+# DASHBOARD V2
+# ==========================================
+
+try:
+
+    # Read AI Score Sheet
+    ws_ai = spreadsheet.worksheet(
+        "AI_Sector_Score"
+    )
+
+    ai_data = ws_ai.get_all_values()
+
+    ai_df = pd.DataFrame(
+        ai_data[1:],
+        columns=ai_data[0]
+    )
+
+    # Read Best Month Ranking
+    ws_month = spreadsheet.worksheet(
+        "Best_Month_Ranking"
+    )
+
+    month_data = ws_month.get_all_values()
+
+    month_df = pd.DataFrame(
+        month_data[1:],
+        columns=month_data[0]
+    )
+
+    # Read Momentum Sheet
+    ws_momentum = spreadsheet.worksheet(
+        "Sector_Momentum_V2"
+    )
+
+    momentum_data = ws_momentum.get_all_values()
+
+    momentum_df = pd.DataFrame(
+        momentum_data[1:],
+        columns=momentum_data[0]
+    )
+
+    # Top Sector
+
+    best_sector = ai_df.iloc[0]["Sector"]
+    best_score = ai_df.iloc[0]["AI Score"]
+
+    # Best Month
+
+    best_month = month_df.iloc[0]["Month"]
+
+    # Highest Momentum
+
+    highest_momentum_sector = (
+        momentum_df.iloc[0]["Sector"]
+    )
+
+    highest_momentum = (
+        momentum_df.iloc[0]["3M Return %"]
+    )
+
+    # Dashboard Data
+
+    dashboard = [
+        ["Metric", "Value"],
+        ["Best Sector", best_sector],
+        ["AI Score", best_score],
+        ["Best Month", best_month],
+        ["Highest Momentum Sector", highest_momentum_sector],
+        ["Highest 3M Return %", highest_momentum],
+        [],
+        ["Top 5 Sector Leaderboard"],
+        ["Rank", "Sector", "AI Score"]
+    ]
+
+    top5 = ai_df.head(5)
+
+    for _, row in top5.iterrows():
+
+        dashboard.append([
+            row["Rank"],
+            row["Sector"],
+            row["AI Score"]
+        ])
+
+    dashboard.append([])
+
+    dashboard.append(
+        ["Suggested Allocation"]
+    )
+
+    dashboard.append(
+        ["Sector", "Weight %"]
+    )
+
+    dashboard.append(
+        [best_sector, 35]
+    )
+
+    if len(ai_df) > 1:
+        dashboard.append(
+            [ai_df.iloc[1]["Sector"], 25]
+        )
+
+    if len(ai_df) > 2:
+        dashboard.append(
+            [ai_df.iloc[2]["Sector"], 20]
+        )
+
+    if len(ai_df) > 3:
+        dashboard.append(
+            [ai_df.iloc[3]["Sector"], 10]
+        )
+
+    dashboard.append(
+        ["Cash", 10]
+    )
+
+    try:
+        ws_dash = spreadsheet.worksheet(
+            "Dashboard_V2"
+        )
+    except:
+        ws_dash = spreadsheet.add_worksheet(
+            title="Dashboard_V2",
+            rows=100,
+            cols=20
+        )
+
+    ws_dash.clear()
+
+    ws_dash.update(
+        values=dashboard,
+        range_name="A1"
+    )
+
+    print("Dashboard Updated")
+
+except Exception as e:
+    print("Dashboard Error")
+    print(str(e))
     
 print("Google Sheet Updated Successfully")
