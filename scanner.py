@@ -876,4 +876,101 @@ except Exception as e:
     print("Dashboard Error")
     print(str(e))
     
+    # ==========================================
+# RELATIVE STRENGTH ENGINE
+# ==========================================
+
+try:
+
+    ws_momentum = spreadsheet.worksheet(
+        "Sector_Momentum_V2"
+    )
+
+    momentum_data = ws_momentum.get_all_values()
+
+    rs_df = pd.DataFrame(
+        momentum_data[1:],
+        columns=momentum_data[0]
+    )
+
+    rs_df["6M Return %"] = pd.to_numeric(
+        rs_df["6M Return %"],
+        errors="coerce"
+    )
+
+    # Nifty Return
+
+    nifty_return = rs_df[
+        rs_df["Sector"] == "Nifty50"
+    ]["6M Return %"].iloc[0]
+
+    rs_results = []
+
+    for _, row in rs_df.iterrows():
+
+        sector = row["Sector"]
+
+        sector_return = row["6M Return %"]
+
+        if nifty_return == 0:
+            rs_score = 0
+        else:
+            rs_score = round(
+                sector_return / nifty_return,
+                2
+            )
+
+        rs_results.append([
+            sector,
+            sector_return,
+            rs_score
+        ])
+
+    final_rs = pd.DataFrame(
+        rs_results,
+        columns=[
+            "Sector",
+            "6M Return %",
+            "RS Score"
+        ]
+    )
+
+    final_rs = final_rs.sort_values(
+        by="RS Score",
+        ascending=False
+    )
+
+    final_rs.insert(
+        0,
+        "Rank",
+        range(1, len(final_rs) + 1)
+    )
+
+    try:
+        ws_rs = spreadsheet.worksheet(
+            "Sector_RS_V2"
+        )
+    except:
+        ws_rs = spreadsheet.add_worksheet(
+            title="Sector_RS_V2",
+            rows=50,
+            cols=10
+        )
+
+    ws_rs.clear()
+
+    rs_data = [
+        final_rs.columns.tolist()
+    ] + final_rs.values.tolist()
+
+    ws_rs.update(
+        values=rs_data,
+        range_name="A1"
+    )
+
+    print("Relative Strength Updated")
+
+except Exception as e:
+    print("RS Engine Error")
+    print(str(e))
 print("Google Sheet Updated Successfully")
