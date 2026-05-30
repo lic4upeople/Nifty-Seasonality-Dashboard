@@ -75,7 +75,7 @@ for sheet_name, ticker in indices.items():
             continue
 
         df.reset_index(inplace=True)
-            print(df.tail())
+        print(df.tail())
         
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = [col[0] for col in df.columns]
