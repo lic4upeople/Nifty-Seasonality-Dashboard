@@ -593,6 +593,143 @@ try:
 
 except Exception as e:
     print("Sector Momentum Error")
-    print(str(e))   
+    print(str(e))  
+    
+# ==========================================
+# AI SECTOR SCORE ENGINE
+# ==========================================
+
+try:
+
+    # Read Sector Ranking
+    ws_rank = spreadsheet.worksheet(
+        "Sector_Ranking_V2"
+    )
+
+    rank_data = ws_rank.get_all_values()
+
+    rank_df = pd.DataFrame(
+        rank_data[1:],
+        columns=rank_data[0]
+    )
+
+    # Read Momentum Ranking
+    ws_momentum = spreadsheet.worksheet(
+        "Sector_Momentum_V2"
+    )
+
+    momentum_data = ws_momentum.get_all_values()
+
+    momentum_df = pd.DataFrame(
+        momentum_data[1:],
+        columns=momentum_data[0]
+    )
+
+    # Convert numeric fields
+
+    rank_df["Avg Return"] = pd.to_numeric(
+        rank_df["Avg Return"],
+        errors="coerce"
+    )
+
+    rank_df["Win Rate %"] = pd.to_numeric(
+        rank_df["Win Rate %"],
+        errors="coerce"
+    )
+
+    momentum_df["3M Return %"] = pd.to_numeric(
+        momentum_df["3M Return %"],
+        errors="coerce"
+    )
+
+    # Merge
+
+    ai_df = pd.merge(
+        rank_df,
+        momentum_df[[
+            "Sector",
+            "3M Return %"
+        ]],
+        on="Sector",
+        how="inner"
+    )
+
+    # Normalize Scores
+
+    ai_df["Seasonality Score"] = (
+        ai_df["Avg Return"].rank(
+            pct=True
+        ) * 100
+    )
+
+    ai_df["Momentum Score"] = (
+        ai_df["3M Return %"].rank(
+            pct=True
+        ) * 100
+    )
+
+    ai_df["Win Score"] = (
+        ai_df["Win Rate %"].rank(
+            pct=True
+        ) * 100
+    )
+
+    # Final AI Score
+
+    ai_df["AI Score"] = (
+        ai_df["Seasonality Score"] * 0.40
+        +
+        ai_df["Momentum Score"] * 0.40
+        +
+        ai_df["Win Score"] * 0.20
+    ).round(2)
+
+    ai_df = ai_df.sort_values(
+        by="AI Score",
+        ascending=False
+    )
+
+    ai_df.insert(
+        0,
+        "Rank",
+        range(1, len(ai_df) + 1)
+    )
+
+    final_df = ai_df[[
+        "Rank",
+        "Sector",
+        "AI Score",
+        "Avg Return",
+        "3M Return %",
+        "Win Rate %"
+    ]]
+
+    try:
+        ws_ai = spreadsheet.worksheet(
+            "AI_Sector_Score"
+        )
+    except:
+        ws_ai = spreadsheet.add_worksheet(
+            title="AI_Sector_Score",
+            rows=50,
+            cols=20
+        )
+
+    ws_ai.clear()
+
+    ai_data = [
+        final_df.columns.tolist()
+    ] + final_df.values.tolist()
+
+    ws_ai.update(
+        values=ai_data,
+        range_name="A1"
+    )
+
+    print("AI Sector Score Updated")
+
+except Exception as e:
+    print("AI Sector Score Error")
+    print(str(e))
     
 print("Google Sheet Updated Successfully")
